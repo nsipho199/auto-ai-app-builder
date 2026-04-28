@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import time
 
 from ..models import Architecture, BuildState
 from ..settings import settings
@@ -57,6 +58,8 @@ class DockerFlutterBuilder(Builder):
             "bash", "-lc", script,
         ]
         append_job_log(job_id, f"[docker] $ {' '.join(cmd)}")
+        timeout = settings.docker_build_timeout_seconds
+        deadline = time.monotonic() + timeout
         try:
             proc = subprocess.Popen(
                 cmd,
@@ -68,6 +71,19 @@ class DockerFlutterBuilder(Builder):
             assert proc.stdout is not None
             for line in proc.stdout:
                 append_job_log(job_id, line.rstrip())
+                if time.monotonic() > deadline:
+                    proc.kill()
+                    proc.wait()
+                    update_job(
+                        job_id,
+                        state=BuildState.failed,
+                        error=f"build exceeded {timeout}s timeout",
+                    )
+                    append_job_log(
+                        job_id,
+                        f"[docker] ERROR: build exceeded {timeout}s timeout, killed",
+                    )
+                    return
             rc = proc.wait()
             if rc != 0:
                 update_job(

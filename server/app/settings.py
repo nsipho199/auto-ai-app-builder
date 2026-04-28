@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     anthropic_model: str = Field(default="claude-3-5-sonnet-latest")
 
     docker_flutter_image: str = Field(default="cirrusci/flutter:stable")
+    docker_build_timeout_seconds: int = Field(default=1800)
 
     cors_allow_origins: list[str] = Field(default_factory=lambda: ["*"])
 
