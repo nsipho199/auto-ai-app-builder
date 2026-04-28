@@ -60,9 +60,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   void _onOperatorPressed(String operator) {
+    if (_display == 'Error') return;
     setState(() {
       if (_operator.isNotEmpty && !_shouldResetDisplay) {
         _calculate();
+        if (_display == 'Error') return;
       }
       _firstOperand = double.parse(_display);
       _operator = operator;
@@ -72,7 +74,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   void _calculate() {
-    if (_operator.isEmpty) return;
+    if (_operator.isEmpty || _display == 'Error') return;
 
     final secondOperand = double.parse(_display);
     double result = 0;
@@ -137,6 +139,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   void _onPercentPressed() {
+    if (_display == 'Error') return;
     setState(() {
       final value = double.parse(_display);
       _display = _formatNumber(value / 100);
