@@ -1,5 +1,5 @@
-name: auto_ai_app_builder
-description: A starter Flutter app for Codemagic builds
+name: simple_calculator
+description: A simple calculator app for Android
 publish_to: 'none'
 
 environment:
